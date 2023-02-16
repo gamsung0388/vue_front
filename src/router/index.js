@@ -1,7 +1,9 @@
+import Vue from 'vue';
 import { createWebHistory, createRouter } from "vue-router";
 import insertboard from "../views/insertboard.vue";
 import selectList from "../views/selectList.vue";
 import detailboard from "../views/detailboard.vue"
+import updateboard from "../views/updateboard.vue"
 
 const routes = [
     {
@@ -19,6 +21,13 @@ const routes = [
         name: "detail",
         component : detailboard,
         props: true
+    },
+    {
+        path: "/update",
+        name: "update",
+        component : updateboard,
+        props: true,
+        
     }
 ];
 
