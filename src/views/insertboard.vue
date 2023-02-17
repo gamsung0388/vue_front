@@ -8,6 +8,7 @@
         </div>
         <div>
           <p>내용</p>
+          <img :src="imgfiles">
           <textarea v-model="board.boardTxt" rows="10"></textarea>
         </div>
         <div>
@@ -15,13 +16,27 @@
         </div>
         <div>
           <button @click="filebtnClick">파일등록</button>
+          <!--<button @click="imgfilebtnClick">이미지등록</button>-->
         </div>
         <div>
-          <form id="fileForm" name="fileForm">
+          <form id="imgfileForm" name = "imgfileForm">
+            <input type="file" ref="boardimgfile" id="boardimgfile" @change="uploadimgFile()" accept="image/*" hidden>
+          </form>
+        </div>  
+        <div>
+          <form>
             <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()" hidden>
-            <div id="data_file_txt">
+            <div>
                 <p>첨부파일</p>
+                <ul>
+                  <li v-for="(file,idx) in selectedFiles" :key="idx">
+                    {{file.name}}<button @click="fileDelete(fileNum)">삭제</button>
+                  </li>
+                </ul>
+                
+
                 <div id="articleFileChange">
+
                 </div>
             </div>
           </form>          
@@ -37,13 +52,14 @@
   
   <script>
   
-  import axios from 'axios'
+  import { file } from '@babel/types';
+import axios from 'axios'
 
   var content_files = new Array();
   var fileNum = 0;      //파일 고유 넘버
   var fileIdxs = "";    //파일 시퀀스들
   var deleteFiles = []; //삭제된 파일 리스트
-
+  
   export default {
     name: 'updateboard',
     data () {
@@ -55,10 +71,12 @@
             userId: 'ryan9320',
             fileIdxs : []
           },
+          imgfiles : [],
           fileCnt : 0,
           fileNum : 0,
           totalCnt: 10,
           fileHTML : "",
+          selectedFiles : [],
           files : [],    //업로드용 파일
           content_files : [],
           filesPreviw:[],
@@ -66,6 +84,22 @@
       }    
     },
     methods : {
+      //이미지 파일 등록
+      imgfilebtnClick(){
+        document.getElementById('boardimgfile').click();
+      },
+      //이미지 파일 등록 및 프리뷰
+      uploadimgFile(ev){
+        var files = this.$refs.boardimgfile.files;
+        if(files){
+          //console.log("imgfile:",this.$refs.boardimgfile.files)
+          var reader = new FileReader();
+          reader.onload = (e) => {
+            imgfiles = e.target.result;
+          }
+          reader.readAsDataURL(input.files[0]); 
+        }            
+      },
 
       //파일 등록
       filebtnClick(){
@@ -75,9 +109,10 @@
       uploadFile(e){
         console.log("files: ",this.$refs.boardfile.files) 
         this.files = this.$refs.boardfile.files
-
-        console.log(this.files)
-
+        
+        const files = this.$refs.boardfile.files;
+        
+        const selectedFiles = [];
         var filesArr = Array.prototype.slice.call(this.files);
 
         if(this.fileCnt + filesArr.length > this.totalCnt){
@@ -92,30 +127,38 @@
           var reader = new FileReader();
           reader.onload = () => {
             content_files.push(f);
+            content_files[fileNum].fileNum = fileNum;
             content_files[fileNum].is_delete = false;
+           
             
-            // 파일 삭제 및 view
-             
-             var changehtml = document.createElement('div')
-             changehtml.innerHTML = 
-                ' <font>' + f.name + '</font>'
-                + ' <button>삭제</button>'
+            // 파일 삭제 및 view             
+//             var changehtml = document.createElement('div')
+//             changehtml.innerHTML = 
+//                ' <font>' + f.name + '</font>'
+//                + ' <button>삭제</button>'
               
-              changehtml.classList.add("sr-only")
-              document.getElementById("articleFileChange").appendChild(changehtml);
+              //changehtml.classList.add("sr-only")
+//              document.getElementById("articleFileChange").appendChild(changehtml);
                           
             fileNum ++;
           }
+          selectedFiles.push(f);
+
           reader.readAsDataURL(f)
 
         });
+
+        console.log(selectedFiles)
+
         this.content_files = content_files;
+        this.selectedFiles = selectedFiles;
+
+        console.log("content_files:")
         console.log(this.content_files)
-        document.getElementById("boardfile").value = "";
-        
+        //document.getElementById("boardfile").value = "";
       },
       
-      fileDelete(fileNum){
+      fileDelete(){
         console.log(fileNum)
         
       },
@@ -136,7 +179,7 @@
           .then((data)=>{
             console.log(data.data.YN);
             if(data.data.YN=="Y"){
-              this.$router.push('/')
+              //this.$router.push('/')
             }else{
               alert("서버 오류");
             }  
@@ -153,17 +196,17 @@
           var Imgform = document.getElementById("fileForm")
           var formData = new FormData();
 
-          console.log("content_files: ",content_files);
+          //console.log("content_files: ",content_files);
           
           for(var i=0;i<content_files.length;i++){
-            console.log(content_files[i]);
+            //console.log(content_files[i]);
             if(!content_files[i].is_delete){
               formData.append("article_file",content_files[i]);
-              formData.append("filePath","/board/main");
+              formData.append("filePath","/vue/boardfile");
             }
           }
 
-          console.log(JSON.stringify(formData));
+          //console.log(JSON.stringify(formData));
           
           this.axios.post('/file-upload', formData,{
             header:{ "Content-type" : "multipart/form-data"},

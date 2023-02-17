@@ -15,16 +15,19 @@
         </div>
         <div>
           <button @click="filebtnClick">파일등록</button>
+          <!--<button @click="imgfilebtnClick">이미지등록</button>-->
         </div>
         <div>
-          <form id="fileForm" name="fileForm">
             <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()" hidden>
             <div id="data_file_txt">
                 <p>첨부파일</p>
-                <div id="articleFileChange">
-                </div>
-            </div>
-          </form>          
+                <ul>
+                  <li v-for="(file,idx) in selectedFiles" :key="idx">
+                    {{file.name}}:{{ file.fileNum }}
+                    <button @click="fileDelete(file.fileNum)">삭제</button>
+                  </li>
+                </ul>
+            </div>        
         </div>
         <div>
           <button @click="fileSave">저장</button> 
@@ -38,9 +41,6 @@
 import router from '@/router';
 import axios from 'axios';
 
-var content_files = new Array();
-var fileNum = 0;      //파일 고유 넘버
-var fileIdxs = "";    //파일 시퀀스들
 var deleteFiles = []; //삭제된 파일 리스트
 
 export default({
@@ -69,17 +69,18 @@ export default({
             fileCnt : 0,
             fileNum : 0,
             totalCnt: 10,
-            fileHTML : "",
-            files : [],    //업로드용 파일
-            content_files : [],
-            filesPreviw:[],
+            deleteFiles : [],   //삭제 파일
+            files : [],         //업로드용 파일
+            selectedFiles : [],
+            content_files : [], //등록 파일
+            deleteFiles : [],
             uploadImageIndex : 0, //이미지 업로드를 위한 변수
 
         }
     },
     methods : {
         load(){
-            this.axios.get("/board/one?boardNum="+encodeURIComponent(this.$route.query.boardNum))
+            this.axios.get("/board/updateForm?boardNum="+encodeURIComponent(this.$route.query.boardNum))
             .then(res => {
                 console.log(res.data);  
 
@@ -87,15 +88,22 @@ export default({
                 this.files = res.data.fileList;                
                 var fileList = res.data.fileList;
 
+                this.fileCnt = fileList.length;
+                console.log("fileNum1:"+this.fileNum);
                 for(var i=0;i<fileList.length;i++){
-                    var changehtml = document.createElement('div')
-                    changehtml.innerHTML = 
-                        ' <font>' + fileList[i].ORIG_NM + '</font>'
-                        + ' <button>삭제</button>'
+
+                    var fileData = fileList[i];
+                    console.log("fileData: ",fileData);
                     
-                    changehtml.classList.add("sr-only")
-                    document.getElementById("articleFileChange").appendChild(changehtml);
+                    fileList[i]["fileNum"] = this.fileNum;
+                   
+                    this.content_files.push(fileList[i]);
+                    this.selectedFiles.push(fileList[i]);
+                    
+                    this.fileNum ++ ;
+
                 }
+                console.log("fileNum2:"+this.fileNum);
                 //console.log(this.board);
 
             })
@@ -117,43 +125,41 @@ export default({
             var filesArr = Array.prototype.slice.call(this.files);
 
             if(this.fileCnt + filesArr.length > this.totalCnt){
-            alert("파일은 최대"+this.totalCnt+"개까지 업로드 할 수 있습니다.")
-            return false;
+                alert("파일은 최대"+this.totalCnt+"개까지 업로드 할 수 있습니다.")
+                return false;
             }else{
-            this.fileCnt = this.fileCnt + filesArr.length;
+                this.fileCnt = this.fileCnt + filesArr.length;
             }
 
             filesArr.forEach( f => {
             
-            var reader = new FileReader();
-            reader.onload = () => {
-                content_files.push(f);
-                content_files[fileNum].is_delete = false;
-                
-                // 파일 삭제 및 view
-                
-                var changehtml = document.createElement('div')
-                changehtml.innerHTML = 
-                    ' <font>' + f.name + '</font>'
-                    + ' <button>삭제</button>'
-                
-                changehtml.classList.add("sr-only")
-                document.getElementById("articleFileChange").appendChild(changehtml);
-                            
-                fileNum ++;
-            }
-            reader.readAsDataURL(f)
+                var reader = new FileReader();
+                console.log("fileNum3: ",this.fileNum);
+                reader.onload = () => {
+                    console.log(f);
+                    this.content_files.push(f);
+                    //this.content_files[fileNum] = fileNum;
+                    //content_files[this.fileNum].is_delete = false;
+
+                    this.fileNum ++;
+                    this.selectedFiles.push(f);
+                }
+            
+                console.log("2content_files: "); 
+                console.log(this.content_files); 
+                                
+                reader.readAsDataURL(f)
 
             });
-            this.content_files = content_files;
-            console.log(this.content_files)
-            document.getElementById("boardfile").value = "";
-            
+                        
         },
 
         fileDelete(fileNum){
             console.log(fileNum)
+            console.log(this.content_files[fileNum]) 
             
+            //is_delete = true
+            //this.filecnt --
         },
 
         save : function() {
@@ -182,16 +188,15 @@ export default({
         fileSave () {
             if(this.fileCnt > 0 ){
                 console.log("추가파일이 있을 때")
-                var Imgform = document.getElementById("fileForm")
                 var formData = new FormData();
 
-                console.log("content_files: ",content_files);
+                //console.log("content_files: ",content_files);
                 
-                for(var i=0;i<content_files.length;i++){
+                for(var i=0;i<this.content_files.length;i++){
                     console.log(content_files[i]);
-                    if(!content_files[i].is_delete){
-                        formData.append("article_file",content_files[i]);
-                        formData.append("filePath","/board/main");
+                    if(!this.content_files[i].is_delete){
+                        formData.append("article_file",this.content_files[i]);
+                        formData.append("filePath","/vue/boardfile");
                     }
                 }
 

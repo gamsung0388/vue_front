@@ -106,6 +106,10 @@ export default {
           this.boardSelect();
         },
         pageGo(page){
+          
+          this.selected = false;
+          this.selectList = [];
+
           this.searchDTO.page= page;
           //this.searchDTO.page = page; 
           this.boardSelect();
@@ -141,16 +145,12 @@ export default {
               .forEach( function(child){
                 console.log(child);
                 pageform.removeChild(child)
-                                
               }
-              
             )
-
             for(var j = this.page.startPage; j<this.page.endPage+1; j++){
               // console.log(j);
               this.pageList.push(j);
             }
-               
           })
           .catch(err => {
               console.log(err);
@@ -167,25 +167,16 @@ export default {
           }
         },
 
-        // boardOneDelete(bnum){
-
-        //   this.oneList.push(bnum);
-
-        //   var params = {
-        //     checkList : Object.values(this.oneList) 
-        //   }
-
-        //   this.boardDelete(params)
-        // },
-
         boardDelete(params){
           this.axios.get("/board/delete?checkList="+encodeURIComponent(JSON.stringify(params.checkList)))
           .then(res => {
             console.log(res.data);  
             this.boardSelect();
             if(this.selected==true){
-              this.selected=false
+              this.selected=false;              
             }
+            this.selectList = [];
+            
           })
           .catch((ex)=>{
             console.error("failed write aricle",ex);

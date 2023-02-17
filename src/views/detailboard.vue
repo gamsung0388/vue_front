@@ -15,7 +15,7 @@
         </tr>
         <tr v-for="(filedata,idx) in fileList" :key="idx">
           <td colspan="2">
-            <a href="javascript:void(0);" @click="filedown(filedata.FILE_ID)">{{ filedata.ORIG_NM }}</a>
+            <a href="javascript:void(0);" @click="filedown(filedata.fileId)">{{ filedata.origNm }}</a>
           </td>
         </tr>  
         <tr>
@@ -151,7 +151,6 @@ export default {
             var params = {
                 checkList : Object.values(this.oneList) 
             }
-
             this.boardDelete(params)
         },
 
@@ -191,11 +190,9 @@ export default {
               this.axios.post("/comment/insert",this.comment)
               .then(res => {
                   console.log(res.data);
-                  
                   if(res.data.result=='Y'){
                       this.cmList()
                   }
-
               })
               .catch((ex)=>{
                   console.error("err:"+ex)
@@ -206,9 +203,7 @@ export default {
             //console.log(this.board.boardNum);
             this.axios.get("/comment/select?boardNum=" +this.board.boardNum)
             .then(res => {
-
                 this.commentList = res.data.commentList;
-                
             })
             .catch((ex)=>{
 
