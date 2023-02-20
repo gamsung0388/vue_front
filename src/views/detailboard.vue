@@ -166,7 +166,9 @@ export default {
         },
 
         filedown(fileId){
-          this.axios.get("/file-download/"+fileId)
+          this.axios.get("/file-download/"+fileId,{
+            responseType: "blob"
+          })
           .then(res => {
             
           })

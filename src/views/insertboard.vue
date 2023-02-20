@@ -24,22 +24,15 @@
           </form>
         </div>  
         <div>
-          <form>
-            <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()" hidden>
-            <div>
-                <p>첨부파일</p>
-                <ul>
-                  <li v-for="(file,idx) in selectedFiles" :key="idx">
-                    {{file.name}}<button @click="fileDelete(fileNum)">삭제</button>
-                  </li>
-                </ul>
-                
-
-                <div id="articleFileChange">
-
-                </div>
-            </div>
-          </form>          
+          <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()" hidden>
+          <div>
+              <p>첨부파일</p>
+              <ul>
+                <li v-for="(file,idx) in content_files" :key="idx">
+                  {{file.name}}<button @click="fileDelete(file.fileNum)">삭제</button>
+                </li>
+              </ul>
+          </div>
         </div>
         <div>
           <button @click="fileSave">저장</button> 
@@ -54,11 +47,6 @@
   
   import { file } from '@babel/types';
 import axios from 'axios'
-
-  var content_files = new Array();
-  var fileNum = 0;      //파일 고유 넘버
-  var fileIdxs = "";    //파일 시퀀스들
-  var deleteFiles = []; //삭제된 파일 리스트
   
   export default {
     name: 'updateboard',
@@ -71,14 +59,16 @@ import axios from 'axios'
             userId: 'ryan9320',
             fileIdxs : []
           },
-          imgfiles : [],
+          
           fileCnt : 0,
           fileNum : 0,
           totalCnt: 10,
-          fileHTML : "",
-          selectedFiles : [],
-          files : [],    //업로드용 파일
-          content_files : [],
+
+          deleteFiles : [],   //삭제 파일
+          files : [],         //업로드용 파일
+          content_files : [], //등록 파일
+          
+          imgfiles : [],
           filesPreviw:[],
           uploadImageIndex : 0 //이미지 업로드를 위한 변수
       }    
@@ -127,20 +117,11 @@ import axios from 'axios'
           var reader = new FileReader();
           reader.onload = () => {
             content_files.push(f);
-            content_files[fileNum].fileNum = fileNum;
-            content_files[fileNum].is_delete = false;
-           
-            
-            // 파일 삭제 및 view             
-//             var changehtml = document.createElement('div')
-//             changehtml.innerHTML = 
-//                ' <font>' + f.name + '</font>'
-//                + ' <button>삭제</button>'
-              
-              //changehtml.classList.add("sr-only")
-//              document.getElementById("articleFileChange").appendChild(changehtml);
+
+            this.content_files[parseInt(this.fileNum)].is_delete = false;
+            this.content_files[parseInt(this.fileNum)].fileNum = this.fileNum;
                           
-            fileNum ++;
+            this.fileNum ++;
           }
           selectedFiles.push(f);
 
@@ -158,9 +139,12 @@ import axios from 'axios'
         //document.getElementById("boardfile").value = "";
       },
       
-      fileDelete(){
-        console.log(fileNum)
-        
+      fileDelete(fileNum){
+          
+          this.content_files[parseInt(fileNum)].is_delete = true; 
+          document.getElementById(fileNum).remove()
+
+          this.fileCnt --
       },
 
       save : function() {
@@ -198,9 +182,9 @@ import axios from 'axios'
 
           //console.log("content_files: ",content_files);
           
-          for(var i=0;i<content_files.length;i++){
+          for(var i=0;i<this.content_files.length;i++){
             //console.log(content_files[i]);
-            if(!content_files[i].is_delete){
+            if(!this.content_files[i].is_delete){
               formData.append("article_file",content_files[i]);
               formData.append("filePath","/vue/boardfile");
             }

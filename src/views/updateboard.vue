@@ -7,7 +7,8 @@
           <input type="text" class="form-control" v-model="board.boardTitle" />
         </div>
         <div>
-          <p>내용</p>
+          <p>내용 <button @click="imgfilebtnClick">이미지등록</button></p>
+          <input ref="boardimg" id="boardimgfile" type="file" @change="uploadimgFile()" hidden>
           <textarea rows="10" v-model="board.boardTxt"></textarea>
         </div>
         <div>
@@ -15,15 +16,20 @@
         </div>
         <div>
           <button @click="filebtnClick">파일등록</button>
-          <!--<button @click="imgfilebtnClick">이미지등록</button>-->
+          
         </div>
         <div>
             <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()" hidden>
             <div id="data_file_txt">
                 <p>첨부파일</p>
                 <ul>
-                  <li v-for="(file,idx) in selectedFiles" :key="idx">
-                    {{file.name}}:{{ file.fileNum }}
+                  <li v-for="(file,idx) in selectedFiles" :key="idx" :id="file.fileId">
+                    <img :id="'img' + file.fileId" src={{file.logipath}} alt="">
+                    {{file.name}}
+                    <button @click="beforefileDelete(file.fileId)">삭제</button>
+                  </li>
+                  <li v-for="(file,idx) in content_files" :key="idx"  :id="file.fileNum">
+                    {{file.name}}
                     <button @click="fileDelete(file.fileNum)">삭제</button>
                   </li>
                 </ul>
@@ -40,8 +46,6 @@
 
 import router from '@/router';
 import axios from 'axios';
-
-var deleteFiles = []; //삭제된 파일 리스트
 
 export default({
     name: "updateboard",
@@ -64,18 +68,19 @@ export default({
                 boardViewcnt : "",
                 boardDate : "",
                 board_udt : "",  
-                fileIdxs : []              
+                fileIdxs : [],
+                delete_files : []
             },
             fileCnt : 0,
             fileNum : 0,
             totalCnt: 10,
+            uploadImageIndex : 0, //이미지 업로드를 위한 변수
+
             deleteFiles : [],   //삭제 파일
             files : [],         //업로드용 파일
             selectedFiles : [],
             content_files : [], //등록 파일
-            deleteFiles : [],
-            uploadImageIndex : 0, //이미지 업로드를 위한 변수
-
+            
         }
     },
     methods : {
@@ -83,27 +88,21 @@ export default({
             this.axios.get("/board/updateForm?boardNum="+encodeURIComponent(this.$route.query.boardNum))
             .then(res => {
                 console.log(res.data);  
+                
+                //boardDetail
+                this.board = res.data.boardDTO;   
 
-                this.board = res.data.boardDTO;
-                this.files = res.data.fileList;                
+                //파일
                 var fileList = res.data.fileList;
 
-                this.fileCnt = fileList.length;
-                console.log("fileNum1:"+this.fileNum);
                 for(var i=0;i<fileList.length;i++){
 
                     var fileData = fileList[i];
                     console.log("fileData: ",fileData);
+                          
+                    this.selectedFiles.push(fileData);
                     
-                    fileList[i]["fileNum"] = this.fileNum;
-                   
-                    this.content_files.push(fileList[i]);
-                    this.selectedFiles.push(fileList[i]);
-                    
-                    this.fileNum ++ ;
-
                 }
-                console.log("fileNum2:"+this.fileNum);
                 //console.log(this.board);
 
             })
@@ -111,7 +110,15 @@ export default({
                 console.error("failed write aricle",ex);
             })
         },
-        //파일 등록
+        //이미지 파일 클릭
+        imgfilebtnClick(){
+            document.getElementById('boardimgfile').click();
+        },
+        //이미지 파일 등록
+        uploadimgFile(e){
+            console.log("files: ",this.$refs.boardimg.files)
+        },
+        //파일 클릭
         filebtnClick(){
             document.getElementById('boardfile').click();
         },
@@ -120,7 +127,7 @@ export default({
             console.log("files: ",this.$refs.boardfile.files) 
             this.files = this.$refs.boardfile.files
 
-            console.log(this.files)
+            console.log(this.files);
 
             var filesArr = Array.prototype.slice.call(this.files);
 
@@ -138,11 +145,11 @@ export default({
                 reader.onload = () => {
                     console.log(f);
                     this.content_files.push(f);
-                    //this.content_files[fileNum] = fileNum;
-                    //content_files[this.fileNum].is_delete = false;
+
+                    this.content_files[parseInt(this.fileNum)].is_delete = false;
+                    this.content_files[parseInt(this.fileNum)].fileNum = this.fileNum;
 
                     this.fileNum ++;
-                    this.selectedFiles.push(f);
                 }
             
                 console.log("2content_files: "); 
@@ -154,12 +161,16 @@ export default({
                         
         },
 
+        beforefileDelete(fileId){
+
+            this.deleteFiles.push(fileId);
+            document.getElementById(fileId).remove()
+        },
+
         fileDelete(fileNum){
-            console.log(fileNum)
-            console.log(this.content_files[fileNum]) 
-            
-            //is_delete = true
-            //this.filecnt --
+            this.content_files[parseInt(fileNum)].is_delete = true; 
+            document.getElementById(fileNum).remove()
+            this.fileCnt--;
         },
 
         save : function() {
@@ -172,6 +183,11 @@ export default({
             }else if(boardTxt==""){
                 alert("내용을 입력해주세요")
             }else{
+
+
+                this.board.delete_files = this.deleteFiles
+                
+
                 this.axios.post('/board/update', this.board)
                 .then((data)=>{
                     if(data.data.YN=="Y"){
@@ -186,6 +202,7 @@ export default({
             }
         },
         fileSave () {
+            console.log(this.fileCnt)
             if(this.fileCnt > 0 ){
                 console.log("추가파일이 있을 때")
                 var formData = new FormData();
@@ -193,7 +210,7 @@ export default({
                 //console.log("content_files: ",content_files);
                 
                 for(var i=0;i<this.content_files.length;i++){
-                    console.log(content_files[i]);
+                    console.log(this.content_files[i]);
                     if(!this.content_files[i].is_delete){
                         formData.append("article_file",this.content_files[i]);
                         formData.append("filePath","/vue/boardfile");
