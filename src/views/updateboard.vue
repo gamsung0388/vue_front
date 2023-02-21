@@ -24,7 +24,7 @@
                 <p>첨부파일</p>
                 <ul>
                   <li v-for="(file,idx) in selectedFiles" :key="idx" :id="file.fileId">
-                    <img :id="'img' + file.fileId" src={{file.logipath}} alt="">
+                    <img :id="'img' + file.fileId" :src="file.logiPath" alt="">
                     {{file.name}}
                     <button @click="beforefileDelete(file.fileId)">삭제</button>
                   </li>

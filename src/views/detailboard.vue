@@ -170,7 +170,20 @@ export default {
             responseType: "blob"
           })
           .then(res => {
+            console.log(res)
+
+            const url = window.URL.createObjectURL(new Blob([res.data]));
+            const link = document.createElement('a');
             
+            console.log(res.headers['content-disposition'])
+            console.log(fileId);
+            
+            const filename = res.headers['content-disposition'] ? res.headers['content-disposition'].split('"')[1] : fileId;
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+
           })
           .catch((ex)=>{
             console.error("failed write aricle",ex);

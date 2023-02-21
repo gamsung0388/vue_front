@@ -7,7 +7,10 @@
           <input type="text" class="form-control" v-model="board.boardTitle"/>
         </div>
         <div>
-          <p>내용</p>
+          <p>
+            내용 
+            <button @click="imgfilebtnClick">이미지등록</button>
+          </p>
           <img :src="imgfiles">
           <textarea v-model="board.boardTxt" rows="10"></textarea>
         </div>
@@ -16,7 +19,7 @@
         </div>
         <div>
           <button @click="filebtnClick">파일등록</button>
-          <!--<button @click="imgfilebtnClick">이미지등록</button>-->
+          
         </div>
         <div>
           <form id="imgfileForm" name = "imgfileForm">
@@ -80,14 +83,16 @@ import axios from 'axios'
       },
       //이미지 파일 등록 및 프리뷰
       uploadimgFile(ev){
-        var files = this.$refs.boardimgfile.files;
+
+        var files = this.$refs.boardimgfile.files[0];
+        
         if(files){
-          //console.log("imgfile:",this.$refs.boardimgfile.files)
+          console.log("imgfile:",files)  
           var reader = new FileReader();
           reader.onload = (e) => {
-            imgfiles = e.target.result;
+            this.imgfiles = e.target.result;
           }
-          reader.readAsDataURL(input.files[0]); 
+          reader.readAsDataURL(files); 
         }            
       },
 
@@ -100,7 +105,7 @@ import axios from 'axios'
         console.log("files: ",this.$refs.boardfile.files) 
         this.files = this.$refs.boardfile.files
         
-        const files = this.$refs.boardfile.files;
+        //const files = this.$refs.boardfile.files;
         
         const selectedFiles = [];
         var filesArr = Array.prototype.slice.call(this.files);
