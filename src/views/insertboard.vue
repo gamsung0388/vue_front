@@ -11,9 +11,12 @@
             내용 
             <button @click="imgfilebtnClick">이미지등록</button>
           </p>
-          <img :src="imgfiles">
+          
           <textarea v-model="board.boardTxt" rows="10"></textarea>
         </div>
+        <div>
+          <img :src="imgfiles">
+        </div>  
         <div>
           태그: <input v-model="board.boardTag">
         </div>

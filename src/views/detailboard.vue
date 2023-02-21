@@ -15,6 +15,7 @@
         </tr>
         <tr v-for="(filedata,idx) in fileList" :key="idx">
           <td colspan="2">
+            <img :src="filedata.logiFull" width="20px">
             <a href="javascript:void(0);" @click="filedown(filedata.fileId)">{{ filedata.origNm }}</a>
           </td>
         </tr>  
@@ -89,9 +90,6 @@ export default {
                 boardViewcnt : "",
                 boardDate : "",
                 board_udt : "",
-            },
-            fileList:{
-
             },
             comment:{
                 commentNum : "",
@@ -210,7 +208,7 @@ export default {
                   }
               })
               .catch((ex)=>{
-                  console.error("err:"+ex)
+                console.error("err:"+ex)
               })
             }
         },
@@ -221,7 +219,7 @@ export default {
                 this.commentList = res.data.commentList;
             })
             .catch((ex)=>{
-
+              console.error("err:"+ex)
             })
         },
         cmUpdateform(commentNum,commentTxt){
@@ -248,11 +246,9 @@ export default {
                   this.cmList();
                   this.updateComment.commentNum = "";
                   this.updateComment.commentTxt = "";
-
-
               })
               .catch((ex)=>{
-
+                console.error("err:"+ex)
               })
             }
         },
@@ -264,7 +260,7 @@ export default {
                 this.cmList();
             })
             .catch((ex)=>{
-
+              console.error("err:"+ex)
             })
 
         }

@@ -7,8 +7,9 @@
           <input type="text" class="form-control" v-model="board.boardTitle" />
         </div>
         <div>
-          <p>내용 <button @click="imgfilebtnClick">이미지등록</button></p>
-          <input ref="boardimg" id="boardimgfile" type="file" @change="uploadimgFile()" hidden>
+          <p>내용</p>
+          <!-- <button @click="imgfilebtnClick">이미지등록</button> -->
+          <input ref="boardimgfile" id="boardimgfile" type="file" @change="uploadimgFile()" hidden>
           <textarea rows="10" v-model="board.boardTxt"></textarea>
         </div>
         <div>
@@ -19,12 +20,12 @@
           
         </div>
         <div>
-            <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()" hidden>
+            <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()"  accept="image/*" hidden>
             <div id="data_file_txt">
                 <p>첨부파일</p>
                 <ul>
                   <li v-for="(file,idx) in selectedFiles" :key="idx" :id="file.fileId">
-                    <img :id="'img' + file.fileId" :src="file.logiPath" alt="">
+                    <img :src="imgfiles">
                     {{file.name}}
                     <button @click="beforefileDelete(file.fileId)">삭제</button>
                   </li>
@@ -71,6 +72,7 @@ export default({
                 fileIdxs : [],
                 delete_files : []
             },
+            imgfiles : [],
             fileCnt : 0,
             fileNum : 0,
             totalCnt: 10,
@@ -116,7 +118,18 @@ export default({
         },
         //이미지 파일 등록
         uploadimgFile(e){
-            console.log("files: ",this.$refs.boardimg.files)
+            //console.log("files: ",this.$refs.boardimg.files)
+
+            var files = this.$refs.boardimgfile.files[0];
+            
+            if(files){
+                console.log("imgfile:",files)  
+                var reader = new FileReader();
+                reader.onload = (e) => {
+                    this.imgfiles = e.target.result;
+                }
+                reader.readAsDataURL(files); 
+            }           
         },
         //파일 클릭
         filebtnClick(){
