@@ -15,7 +15,7 @@
         </tr>
         <tr v-for="(filedata,idx) in fileList" :key="idx">
           <td colspan="2">
-            <img :src="filedata.logiFull" width="20px">
+            <img :src="imageUrl">
             <a href="javascript:void(0);" @click="filedown(filedata.fileId)">{{ filedata.origNm }}</a>
           </td>
         </tr>  
@@ -64,6 +64,7 @@
       
 </template>
 <script>
+import axios from 'axios';
 import detailcomment from "./detailcomment.vue"
 
 export default {
@@ -105,7 +106,10 @@ export default {
             },
             updateCommentTxt : "",
             commentList : [],
-            oneList : []
+            oneList : [],
+            fileList : [],
+            fileIds : [],
+            imageUrl : []
         }
     },
     methods:{
@@ -124,9 +128,17 @@ export default {
 
                 this.board = boardDTO;
                 this.fileList = fileList;
-
                 this.comment.boardNum = this.board.boardNum;
                 this.updateComment.boardNum = this.board.boardNum;
+
+                for(var i=0; i < fileList.length;i++ ){
+                  var fileData = fileList[i];
+
+                  this.fileIds.push(fileData.fileId);
+                }
+
+                this.imageUrlLoad();
+
                 //console.log(this.board);
                 this.cmList();
             })
@@ -134,6 +146,7 @@ export default {
                 console.error("failed write aricle",ex);
             })
         },
+        
         closeInfo(){
             $router.back();
         },
@@ -187,6 +200,32 @@ export default {
             console.error("failed write aricle",ex);
           })
         },
+
+        imageUrlLoad(){
+
+          axios.get('/imageview/'+this.fileIds,{
+            responseType : 'arraybuffer'
+          })
+          .then(res=>{
+            console.log("res: ",res);
+            console.log(res.data.length);
+
+            // for(let i = 0; i < res.data.length;i++){
+              
+            //   const blob = new Blob([res.data], { type: 'image/png' });
+            //   const imageUrl = URL.createObjectURL(blob);
+
+            //   console.log("imageUrl: "+imageUrl)
+
+            //   //this.imageUrl.push(imageUrl);
+            // }            
+          
+          })
+          .catch(error => {
+            console.log(error);
+          });
+        },
+
         /******************************/
         
         //댓글
