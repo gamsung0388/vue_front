@@ -4,7 +4,6 @@ import App from './App.vue'
 import axios from 'axios'
 import store from './store/storage'
 
-
 axios.defaults.baseURL = 'http://localhost:3000'
 
 const app = createApp(App)

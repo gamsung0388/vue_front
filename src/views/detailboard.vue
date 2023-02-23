@@ -15,7 +15,7 @@
         </tr>
         <tr v-for="(filedata,idx) in fileList" :key="idx">
           <td colspan="2">
-            <img :src="imageUrl">
+            <img :src="file">
             <a href="javascript:void(0);" @click="filedown(filedata.fileId)">{{ filedata.origNm }}</a>
           </td>
         </tr>  
@@ -137,7 +137,7 @@ export default {
                   this.fileIds.push(fileData.fileId);
                 }
 
-                this.imageUrlLoad();
+                // this.imageUrlLoad();
 
                 //console.log(this.board);
                 this.cmList();
@@ -204,21 +204,20 @@ export default {
         imageUrlLoad(){
 
           axios.get('/imageview/'+this.fileIds,{
-            responseType : 'arraybuffer'
+            responseType : 'blob'
           })
           .then(res=>{
             console.log("res: ",res);
-            console.log(res.data.length);
+            console.log(res.data.byteLength);
 
-            // for(let i = 0; i < res.data.length;i++){
-              
-            //   const blob = new Blob([res.data], { type: 'image/png' });
-            //   const imageUrl = URL.createObjectURL(blob);
-
-            //   console.log("imageUrl: "+imageUrl)
-
-            //   //this.imageUrl.push(imageUrl);
-            // }            
+            // const data = new Uint8Array(res.data);
+            // for(let i = 0; i < res.data.length; i++){
+            //   setTimeout(() => {
+            //     const blob = new Blob([res.data[i]], { type: 'image/png' });
+            //     const imageUrl = URL.createObjectURL(blob);
+            //     console.log("imageUrl: "+imageUrl);
+            //   }, i * 100); // wait 100ms between each log statement
+            // }
           
           })
           .catch(error => {
