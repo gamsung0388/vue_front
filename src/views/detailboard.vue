@@ -13,12 +13,13 @@
           <th>태그</th>
           <td>{{board.boardTag}}</td>
         </tr>
-        <tr v-for="(filedata,idx) in fileList" :key="idx">
-          <td colspan="2">
-            <img :src="file">
-            <a href="javascript:void(0);" @click="filedown(filedata.fileId)">{{ filedata.origNm }}</a>
-          </td>
-        </tr>  
+        <tr>
+            <td v-for="fileId in fileIds" :key="fileId">
+              <a href="javascript:void(0);" @click="filedown(fileId)">
+                <img :src="getImageUrl(fileId)" width="100" />
+              </a>
+            </td>              
+        </tr> 
         <tr>
           <th>등록일</th>
           <td>{{board.boardDate}}</td>
@@ -27,7 +28,7 @@
           <th>수정일</th>
           <td>{{board.boardUdt}}</td>
         </tr>
-
+        
       </table>
       <button @click="boardUpdate">수정</button>
       <button @click="boardOneDelete(board.boardNum)">삭제</button>
@@ -53,8 +54,7 @@
                 </div>      
                 
                 <div v-if="updateComment.commentNum==commentData.commentNum&& commentUpdate==true">
-                  <textarea name="" id="" cols="30" rows="5" v-model="updateComment.commentTxt">
-                    
+                  <textarea name="" id="" cols="30" rows="5" v-model="updateComment.commentTxt">  
                   </textarea>
                 </div>
             </div>
@@ -109,7 +109,8 @@ export default {
             oneList : [],
             fileList : [],
             fileIds : [],
-            imageUrl : []
+            imageUrl : [],
+            images : {}
         }
     },
     methods:{
@@ -137,7 +138,7 @@ export default {
                   this.fileIds.push(fileData.fileId);
                 }
 
-                // this.imageUrlLoad();
+                //  this.imageUrlLoad();
 
                 //console.log(this.board);
                 this.cmList();
@@ -146,7 +147,32 @@ export default {
                 console.error("failed write aricle",ex);
             })
         },
-        
+
+        getImageUrl(fileId) {
+          console.log("images/fileId: "+ this.images[parseInt(fileId)]);
+          if (!this.images[parseInt(fileId)]) {
+            console.log("fileId: "+ fileId);
+            console.log("images: "+ JSON.stringify(this.images));
+            
+            this.images[parseInt(fileId)] = "";
+            axios
+              .get("/getImage/" + fileId, { responseType: "blob" })
+              .then((response) => {
+                console.log("res: ",response.data);
+                const reader = new FileReader();
+                reader.onload = () => {
+                  this.images[parseInt(fileId)] = reader.result;
+                };
+                
+                reader.readAsDataURL(response.data);
+              })
+              .catch((error) => {
+                console.log(error);
+              });            
+          }
+          return this.images[parseInt(fileId)];  
+        },
+
         closeInfo(){
             $router.back();
         },
@@ -208,7 +234,6 @@ export default {
           })
           .then(res=>{
             console.log("res: ",res);
-            console.log(res.data.byteLength);
 
             // const data = new Uint8Array(res.data);
             // for(let i = 0; i < res.data.length; i++){
