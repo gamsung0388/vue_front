@@ -9,7 +9,6 @@
         <div>
           <p>
             내용 
-            <button @click="imgfilebtnClick">이미지등록</button>
           </p>
           
           <textarea v-model="board.boardTxt" rows="10"></textarea>
@@ -25,12 +24,7 @@
           
         </div>
         <div>
-          <form id="imgfileForm" name = "imgfileForm">
-            <input type="file" ref="boardimgfile" id="boardimgfile" @change="uploadimgFile()" accept="image/*" hidden>
-          </form>
-        </div>  
-        <div>
-          <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()" hidden>
+          <input ref="boardfile" id="boardfile" type="file" multiple @change="uploadFile()" accept="image/*" hidden>
           <div>
               <p>첨부파일</p>
               <ul>

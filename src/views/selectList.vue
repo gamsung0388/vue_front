@@ -46,12 +46,12 @@
             <span>
               <img v-if="page.existNextPage==true" @click="pageGo(page.endPage+1)" src="@/assets/img/right.png" style="width:12px">
               <img src="@/assets/img/tworight.png" @click="pageGo(page.totalPageCnt)" style="width:12px">
-            </span>            
+            </span>
           </div>
           <router-link to="/insert"><button>등록</button></router-link> 
           <button @click="boardTwoDelete()">삭제</button>
           <br>
-          <button @click="managerPage()">관리자</button>
+          <router-link to="/manage"><button>관리자</button></router-link> 
         </div>
       </div>  
   </div>
@@ -188,7 +188,7 @@ export default {
         showInfo(idx){
           this.item =  this.list[idx]
           this.$router.push({path:'/detail',query: {boardNum: this.item.boardNum}})
-        }
+        },
         
     }
 }
