@@ -196,12 +196,9 @@ export default({
             }else if(boardTxt==""){
                 alert("내용을 입력해주세요")
             }else{
-
-
                 this.board.delete_files = this.deleteFiles
-                
-
                 this.axios.post('/board/update', this.board)
+                
                 .then((data)=>{
                     if(data.data.YN=="Y"){
                         this.$router.push('/')

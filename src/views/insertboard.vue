@@ -124,7 +124,7 @@ import axios from 'axios'
           
           var reader = new FileReader();
           reader.onload = () => {
-            content_files.push(f);
+            this.content_files.push(f);
 
             this.content_files[parseInt(this.fileNum)].is_delete = false;
             this.content_files[parseInt(this.fileNum)].fileNum = this.fileNum;
@@ -139,7 +139,7 @@ import axios from 'axios'
 
         console.log(selectedFiles)
 
-        this.content_files = content_files;
+        //this.content_files = content_files;
         this.selectedFiles = selectedFiles;
 
         console.log("content_files:")
@@ -171,7 +171,7 @@ import axios from 'axios'
           .then((data)=>{
             console.log(data.data.YN);
             if(data.data.YN=="Y"){
-              //this.$router.push('/')
+              this.$router.push('/')
             }else{
               alert("서버 오류");
             }  
@@ -193,7 +193,7 @@ import axios from 'axios'
           for(var i=0;i<this.content_files.length;i++){
             //console.log(content_files[i]);
             if(!this.content_files[i].is_delete){
-              formData.append("article_file",content_files[i]);
+              formData.append("article_file",this.content_files[i]);
               formData.append("filePath","/vue/boardfile");
             }
           }

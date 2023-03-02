@@ -14,19 +14,22 @@
           <td>{{board.boardTag}}</td>
         </tr>
         <tr>
-            <td v-for="fileId in fileIds" :key="fileId">
-              <a href="javascript:void(0);" @click="filedown(fileId)">
-                <img :src="getImageUrl(fileId)" width="100" />
-              </a>
+            <td v-for="img in images" :key="img">
+                <img :src="img" width="100" />
             </td>              
         </tr> 
+        <tr v-for="fileData,idx in fileList" :key="idx" >
+          <td colspan="2">
+              <a href="javascript:void(0);" @click="filedown(fileData.fileId)">{{fileData.name}}</a>
+          </td>      
+        </tr>
         <tr>
           <th>등록일</th>
-          <td>{{board.boardDate}}</td>
+          <td>{{board.boardDateFormatted}}</td>
         </tr>
         <tr>
           <th>수정일</th>
-          <td>{{board.boardUdt}}</td>
+          <td>{{board.boardUdtFormatted}}</td>
         </tr>
         
       </table>
@@ -43,10 +46,10 @@
         <div>
             <div v-for="(commentData,idx) in commentList" :key='idx'>
                 <p>{{ commentData.userId}} 
-                  <button v-if="updateComment.commentNum != commentData.commentNum" @click="cmUpdateform(commentData.commentNum,commentData.commentTxt)">수정</button>
-                  <button v-if="updateComment.commentNum != commentData.commentNum" @click="cmDelete(commentData.commentNum)">삭제</button>
-                  <button v-if="updateComment.commentNum==commentData.commentNum && commentUpdate==true" @click="cmUpdate(commentData.commentNum)">저장</button>
-                  <button v-if="updateComment.commentNum==commentData.commentNum && commentUpdate==true" @click="cmCancle">취소</button>
+                  <button v-if="updateComment.commentNum != commentData.commentNum" @click="() => cmUpdateform(commentData.commentNum,commentData.commentTxt)">수정</button>
+                  <button v-if="updateComment.commentNum != commentData.commentNum" @click="() => cmDelete(commentData.commentNum)">삭제</button>
+                  <button v-if="updateComment.commentNum==commentData.commentNum && commentUpdate==true" @click=" () => cmUpdate(commentData.commentNum)">저장</button>
+                  <button v-if="updateComment.commentNum==commentData.commentNum && commentUpdate==true" @click=" () => cmCancle">취소</button>
 
                 </p>              
                 <div v-if="updateComment.commentNum != commentData.commentNum">
@@ -91,6 +94,7 @@ export default {
                 boardViewcnt : "",
                 boardDate : "",
                 board_udt : "",
+                fileIdxs : []
             },
             comment:{
                 commentNum : "",
@@ -117,60 +121,45 @@ export default {
         load(){
           this.boardOne()
         },
-        boardOne(){
-          this.axios.get("/board/one?boardNum="+encodeURIComponent(this.$route.query.boardNum))
-            .then(res => {
-                console.log(res.data);  
-                var boardDTO = res.data.boardDTO
-                var fileList = res.data.fileList
+        async boardOne(){
+          try{
+            const res = await this.axios.get("/board/one?boardNum="+encodeURIComponent(this.$route.query.boardNum))
+            const { boardDTO,fileList } = res.data;
+            this.board = boardDTO;
+            this.fileList = fileList;
+            this.comment.boardNum = this.board.boardNum;
+            this.updateComment.boardNum = this.board.boardNum;
 
-                console.log(boardDTO);  
-                console.log(fileList);  
+            for(var i=0; i < fileList.length;i++ ){
+              var fileData = fileList[i];
 
-                this.board = boardDTO;
-                this.fileList = fileList;
-                this.comment.boardNum = this.board.boardNum;
-                this.updateComment.boardNum = this.board.boardNum;
-
-                for(var i=0; i < fileList.length;i++ ){
-                  var fileData = fileList[i];
-
-                  this.fileIds.push(fileData.fileId);
-                }
-
-                //  this.imageUrlLoad();
-
-                //console.log(this.board);
-                this.cmList();
-            })
-            .catch((ex)=>{
-                console.error("failed write aricle",ex);
-            })
+              this.fileIds.push(fileData.fileId);
+              this.getImageUrl(fileData.fileId);
+            }
+            this.cmList();
+          } catch (ex) {
+            console.error("failed write article", ex);
+          }          
         },
 
-        getImageUrl(fileId) {
-          console.log("images/fileId: "+ this.images[parseInt(fileId)]);
+        getImageUrl(fileId) { 
           if (!this.images[parseInt(fileId)]) {
-            console.log("fileId: "+ fileId);
-            console.log("images: "+ JSON.stringify(this.images));
-            
             this.images[parseInt(fileId)] = "";
             axios
               .get("/getImage/" + fileId, { responseType: "blob" })
               .then((response) => {
-                console.log("res: ",response.data);
+                //console.log("res: ",response.data);
                 const reader = new FileReader();
                 reader.onload = () => {
                   this.images[parseInt(fileId)] = reader.result;
                 };
-                
                 reader.readAsDataURL(response.data);
               })
               .catch((error) => {
                 console.log(error);
               });            
           }
-          return this.images[parseInt(fileId)];  
+          //console.log("this.images: ",this.images);
         },
 
         closeInfo(){
@@ -226,30 +215,6 @@ export default {
             console.error("failed write aricle",ex);
           })
         },
-
-        imageUrlLoad(){
-
-          axios.get('/imageview/'+this.fileIds,{
-            responseType : 'blob'
-          })
-          .then(res=>{
-            console.log("res: ",res);
-
-            // const data = new Uint8Array(res.data);
-            // for(let i = 0; i < res.data.length; i++){
-            //   setTimeout(() => {
-            //     const blob = new Blob([res.data[i]], { type: 'image/png' });
-            //     const imageUrl = URL.createObjectURL(blob);
-            //     console.log("imageUrl: "+imageUrl);
-            //   }, i * 100); // wait 100ms between each log statement
-            // }
-          
-          })
-          .catch(error => {
-            console.log(error);
-          });
-        },
-
         /******************************/
         
         //댓글
@@ -325,9 +290,7 @@ export default {
             .catch((ex)=>{
               console.error("err:"+ex)
             })
-
         }
-
     }
 }
 

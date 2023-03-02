@@ -29,8 +29,8 @@
               <td align="center"><button @click="showInfo(idx)">{{vitem.boardTitle}}</button></td>
               <td>{{vitem.userId}}</td>
               <td align="center">{{vitem.boardViewcnt}}</td>          
-              <td>{{vitem.boardDate}}</td>
-              <td>{{vitem.boardUdt}}</td>
+              <td>{{vitem.boardDateFormatted}}</td>
+              <td>{{vitem.boardUdtFormatted}}</td>
             </tr>
           </tbody>
         </table>
@@ -50,6 +50,8 @@
           </div>
           <router-link to="/insert"><button>등록</button></router-link> 
           <button @click="boardTwoDelete()">삭제</button>
+          <br>
+          <button @click="managerPage()">관리자</button>
         </div>
       </div>  
   </div>
