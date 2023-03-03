@@ -1,6 +1,8 @@
 <template>
   <div class="selectList">
       <div v-if="selected==false">
+        <p>사용자</p>
+        <router-link to="/manage"><button>관리자 전환</button></router-link> 
         <table border="1">
           <thead>
             <tr>
@@ -37,21 +39,21 @@
         <div>
           <div>
             <span>
-              <img src="@/assets/img/twoleft.png" @click="pageGo(1)" style="width:12px">
-              <img v-if="page.existPrevPage==true" @click="pageGo(page.startPage+1)" src="@/assets/img/left.png" style="width:12px">
+              <img v-if="page.page != page.startPage" src="@/assets/img/twoleft.png" @click="pageGo(1)" style="width:12px">
+              <img v-if="page.existPrevPage==true" @click="pageGo(page.startPage-5)" src="@/assets/img/left.png" style="width:12px">
             </span>
             <span class="pageform" id="pageform">
               <a href="javascript:void(0)" @click="pageGo(page)"  v-for="page in pageList" :key="page"> {{page}} </a>
             </span>               
             <span>
               <img v-if="page.existNextPage==true" @click="pageGo(page.endPage+1)" src="@/assets/img/right.png" style="width:12px">
-              <img src="@/assets/img/tworight.png" @click="pageGo(page.totalPageCnt)" style="width:12px">
+              <img v-if="page.endPage < page.totalPageCnt" src="@/assets/img/tworight.png" @click="pageGo(page.totalPageCnt)" style="width:12px">
             </span>
           </div>
           <router-link to="/insert"><button>등록</button></router-link> 
           <button @click="boardTwoDelete()">삭제</button>
           <br>
-          <router-link to="/manage"><button>관리자</button></router-link> 
+          
         </div>
       </div>  
   </div>
