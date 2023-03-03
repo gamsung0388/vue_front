@@ -39,7 +39,7 @@
         <div>
           <div>
             <span>
-              <img v-if="page.page != page.startPage" src="@/assets/img/twoleft.png" @click="pageGo(1)" style="width:12px">
+              <img v-if="page.page != 1" src="@/assets/img/twoleft.png" @click="pageGo(1)" style="width:12px">
               <img v-if="page.existPrevPage==true" @click="pageGo(page.startPage-5)" src="@/assets/img/left.png" style="width:12px">
             </span>
             <span class="pageform" id="pageform">
