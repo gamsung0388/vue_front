@@ -1,6 +1,8 @@
 import { createStore } from "vuex";
+import Vuex from 'vuex';
 
-export default createStore({
+
+export const store = new Vuex.Store ({
     state : {
         counter : 2
     },
@@ -13,5 +15,8 @@ export default createStore({
         setCounter(state,value){
             state.counter = value;
         }
+    },
+    actions : {
+
     }
 })

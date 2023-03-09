@@ -242,7 +242,7 @@ export default {
         },
         cmList(){
             //console.log(this.board.boardNum);
-            this.axios.get("/comment/select?boardNum=" +this.board.boardNum)
+            this.axios.get("/comment/selectOne?boardNum=" +this.board.boardNum)
             .then(res => {
                 this.commentList = res.data.commentList;
             })

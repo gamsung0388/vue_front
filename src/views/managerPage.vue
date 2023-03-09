@@ -1,8 +1,9 @@
 <template>
     <div class="selectList">
         <div v-if="selected==false">
-            <p>관리자</p>
+            <p>관리자(게시글)</p>
             <router-link to="/"><button>사용자 전환</button></router-link> 
+            <router-link to="/manageC"><button>댓글 전환</button></router-link>
             <table border="1">
                 <thead>
                 <tr>

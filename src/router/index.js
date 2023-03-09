@@ -5,6 +5,8 @@ import selectList from "../views/selectList.vue";
 import detailboard from "../views/detailboard.vue"
 import updateboard from "../views/updateboard.vue"
 import managerPage from "../views/managerPage.vue"
+import manageComent from "../views/manageComent.vue"
+import detailcomment from "../views/detailcomment.vue"
 
 const routes = [
     {
@@ -35,7 +37,20 @@ const routes = [
         name: "managerPage",
         component : managerPage,
         props: true,
+    },
+    {
+        path: "/manageC",
+        name: "mangegerPage2",
+        component : manageComent, 
+        props:true
+    },
+    {
+        path: "/detailcomment",
+        name: "detailcomment",
+        component : detailcomment,
+        props: true
     }
+
 ];
 
 const router = createRouter({

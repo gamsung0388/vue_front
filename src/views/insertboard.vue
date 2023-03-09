@@ -29,6 +29,7 @@
               <p>첨부파일</p>
               <ul>
                 <li v-for="(file,idx) in content_files" :key="idx">
+                  <img src= "file">
                   {{file.name}}<button @click="fileDelete(file.fileNum)">삭제</button>
                 </li>
               </ul>
@@ -63,11 +64,9 @@ import axios from 'axios'
           fileCnt : 0,
           fileNum : 0,
           totalCnt: 10,
-
           deleteFiles : [],   //삭제 파일
           files : [],         //업로드용 파일
           content_files : [], //등록 파일
-          
           imgfiles : [],
           filesPreviw:[],
           uploadImageIndex : 0 //이미지 업로드를 위한 변수
@@ -177,7 +176,14 @@ import axios from 'axios'
       },
 
       fileSave () {
-        if(this.fileCnt > 0 ){
+        var boardTitle = this.board.boardTitle;
+        var boardTxt = this.board.boardTxt;
+
+        if(boardTitle==""){
+          alert("제목을 입력해주세요")
+        }else if(boardTxt==""){
+          alert("내용을 입력해주세요")
+        }else if(this.fileCnt > 0 ){
           console.log("추가파일이 있을 때")
           var Imgform = document.getElementById("fileForm")
           var formData = new FormData();

@@ -3,7 +3,6 @@
         <div>댓글{{ boardNum }}</div>
         <div>
             <input type="text" v-model="comment.commentTxt">
-            <button @click="cmAdd">등록</button>  
         </div> 
         <div>
             <div v-for="(commentData,idx) in commentList" :key='idx'>
