@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1><router-link to="/">게시물</router-link></h1>
+    <div>
+      <router-link to="/">게시판</router-link>
+      <router-link to="/login">로그인</router-link>
+    </div>
     <nav>
     </nav>
     <router-view />  

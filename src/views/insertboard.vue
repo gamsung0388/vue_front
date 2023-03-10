@@ -46,9 +46,9 @@
   
   <script>
   
-  import { file } from '@babel/types';
+import { file } from '@babel/types';
 import axios from 'axios'
-  
+
   export default {
     name: 'updateboard',
     data () {
@@ -178,7 +178,7 @@ import axios from 'axios'
       fileSave () {
         var boardTitle = this.board.boardTitle;
         var boardTxt = this.board.boardTxt;
-
+ 
         if(boardTitle==""){
           alert("제목을 입력해주세요")
         }else if(boardTxt==""){
@@ -198,8 +198,6 @@ import axios from 'axios'
             }
           }
 
-          //console.log(JSON.stringify(formData));
-          
           this.axios.post('/file-upload', formData,{
             header:{ "Content-type" : "multipart/form-data"},
           }).then((data)=>{
@@ -215,8 +213,6 @@ import axios from 'axios'
           }).catch((ex)=>{
             console.error("failed write aricle",ex)
           })
-
-
 
         }else{
           console.log("추가파일이 없을 때")

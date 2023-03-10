@@ -7,6 +7,8 @@ import updateboard from "../views/updateboard.vue"
 import managerPage from "../views/managerPage.vue"
 import manageComent from "../views/manageComent.vue"
 import detailcomment from "../views/detailcomment.vue"
+import login from "../views/login.vue"
+import memberjoin from "../views/memberJoin.vue"
 
 const routes = [
     {
@@ -49,7 +51,20 @@ const routes = [
         name: "detailcomment",
         component : detailcomment,
         props: true
-    }
+    },
+    {
+        path: "/login",
+        name: "login",
+        component :login,
+        props : true
+        
+    },
+    {
+        path: "/memberjoin",
+        name: "memberjoin",
+        component :memberjoin,
+        props : true
+    },
 
 ];
 
